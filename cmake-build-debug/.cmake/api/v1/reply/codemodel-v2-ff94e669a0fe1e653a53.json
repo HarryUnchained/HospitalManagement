@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "/Users/harry/CLionProjects/untitled/cmake-build-debug",
-		"source" : "/Users/harry/CLionProjects/untitled"
+		"build" : "/Users/harry/CLionProjects/hospitalManagement/cmake-build-debug",
+		"source" : "/Users/harry/CLionProjects/hospitalManagement"
 	},
 	"version" : 
 	{

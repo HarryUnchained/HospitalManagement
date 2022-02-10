@@ -1,8 +1,3 @@
-/*
- * If you are running this program for the first time you will have to create two text files.
- * Create a file named DoctorData.txt and put a 1 at the beginning of the file.
- * Create another file named PatientData.txt and put a 1 at the beginning of the file.
- */
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -10,16 +5,17 @@
 
 using namespace std;
 
+void firstRun();  //If the program is running for the first time automatically creates doctor and patient data file
 
 void displayPatientMainMenu(); //Main menu for patients
 
 void bookAppointment(); //Books Patient Appointment
 
-string checkGender(string *gender); //Returns gender string based on given parameter
+string checkGender(string* gender); //Returns gender string based on given parameter
 
-void displayRecords(string *patient_or_doctor); //Display all records for doctor or patient based upon which string paramater is passed to it
+void displayRecords(string* patient_or_doctor); //Display all records for doctor or patient based upon which string parameter is passed to it
 
-int searchPatientOrDoctor(string *patient_or_doctor); //Search inside Doctor or Patient structure and return a non-zero value if id found
+int searchPatientOrDoctor(string* patient_or_doctor); //Search inside Doctor or Patient structure and return a non-zero value if id found
 
 void availableDoctors(); //List available doctors
 
@@ -27,13 +23,9 @@ void displayDays(int doc_selected); //List selected doctor days
 
 void displaySlots(int doc_selected, int day_selected); //List selected doctor slots
 
-void displayPatientOrDoctor(int id, string *patient_or_doctor); //Display Patient or Doctor info
+void displayPatientOrDoctor(int id, string* patient_or_doctor); //Display Patient or Doctor info
 
-bool isEmptyDatabase(string *patient_or_doctor); //Check if patient or doctor record exists
-
-int getLastPatientID(); //Get last patient ID from its file
-
-int getLastDoctorID(); //Get last doctor ID from its file
+bool isEmptyDatabase(string* patient_or_doctor); //Check if patient or doctor record exists
 
 int loginScreen(); //Main login screen
 
@@ -41,7 +33,7 @@ void displayOnTop(); //Display clinic name on top
 
 void displayAdminMainMenu(); //Main menu for admins
 
-bool isPatient(string *patient_or_doctor); //Returns true if the given parameter is a patient and false otherwise
+bool isPatient(string* patient_or_doctor); //Returns true if the given parameter is a patient and false otherwise
 
 void addDoctor(); //Add a new doctor
 
@@ -49,7 +41,7 @@ void addDoctorDays(string* days_passed, string day_characters, int id); //Saves 
 
 void addDoctorSlots(int id); // Saves the slots for doctor
 
-void deleteDoctorOrPatient(string *patient_or_doctor); //Find's and deletes a doctors or patient's record
+void deleteDoctorOrPatient(string* patient_or_doctor); //Find's and deletes a doctors or patient's record
 
 void modifyDoctorData(); //Change the days or slots for doctor
 
@@ -69,11 +61,9 @@ struct PatientData {
 };
 
 struct Doctors {
-
     string doc_name = "Empty"; //Declared empty so could later be used to identify if record exists
-    string clinic_days[5] = { "Booked", "Booked", "Booked", "Booked", "Booked" }; //Clinic only opens for 5 days but doctor could sit lesser than those
-    string doctors_slots[5][6]; //Maximum slots for a doctor per day are 6
-
+    string clinic_days[5] = { "Booked" }; //Clinic only opens for 5 days but doctor could sit lesser than those
+    string doctors_slots[5][6] = { "Booked" }; //Maximum slots for a doctor per day are 6
 };
 
 
@@ -88,12 +78,12 @@ int booking_doctors_left = doctor_counter;
 
 
 int main() {
+
+    firstRun();
+    getDataFromFile();
+
     char response = 'Y';
     int selection;
-
-    patient_counter = getLastPatientID();
-    doctor_counter = getLastDoctorID();
-    getDataFromFile();
 
     do {
         displayOnTop();
@@ -116,7 +106,7 @@ int main() {
         cin >> response;
         system("CLS");
 
-    } while (response != 'N' && response != 'n');
+    } while (response != 'Y' && response != 'y');
     displayOnTop();
     cout << "\n\nProgram executed successfully...\n\n\n";
     saveDataToFile();
@@ -128,7 +118,7 @@ void displayPatientMainMenu() {
     int selection;
     char response = 'Y';
 
-    do{
+    do {
         WrongSelection:
         displayOnTop();
 
@@ -142,39 +132,35 @@ void displayPatientMainMenu() {
 
         system("CLS");
 
-        if (selection < 1 || selection > 5) {
-            cout << "Task not available!";
-            goto WrongSelection;
-        }
-
-
-        if(selection == 1) {
+        if (selection == 1) {
             if (booking_doctors_left == 0) {
                 cout << "\nBookings aren't available at the moment.\n\n";
-            } else { bookAppointment(); }
+            }
+            else { bookAppointment(); }
         }
-        else if(selection == 2) {
+        else if (selection == 2) {
             string patient_or_doc = "Patient";
             displayRecords(&patient_or_doc);
         }
-        else if(selection == 3) {
+        else if (selection == 3) {
             string patient_or_doc = "Patient";
             searchPatientOrDoctor(&patient_or_doc);
         }
-        else if(selection == 4) {
+        else if (selection == 4) {
             availableDoctors();
         }
-        else if(selection == 5) {
+        else if (selection == 5) {
             testRecommendation();
         }
         else {
-            cout << "Invalid Response!\n\n";
+            cout << "Task not available!";
+            goto WrongSelection;
         }
-        cout << "\n\nDo you wish to perform another task?(Y/N): ";
+        cout << "\n\nDo you wish to exit patient main menu?(Y/N): ";
         cin >> response;
         system("CLS");
 
-    } while(response != 'N' && response != 'n');
+    } while (response != 'Y' && response != 'y');
 
 }
 
@@ -240,12 +226,12 @@ void bookAppointment() {
 
         system("CLS");
         string patient_or_doc = "Patient";
-        displayPatientOrDoctor(patient_counter,&patient_or_doc);
+        displayPatientOrDoctor(patient_counter, &patient_or_doc);
         patient_counter++;
     }
 }
 
-string checkGender(string *gender) {
+string checkGender(string* gender) {
     if (*gender == "M" || *gender == "m" || *gender == "male" || *gender == "Male") {
         return "Male";
     }
@@ -254,11 +240,11 @@ string checkGender(string *gender) {
     }
 }
 
-void displayRecords(string *patient_or_doctor) {
+void displayRecords(string* patient_or_doctor) {
 
     if (isPatient(patient_or_doctor)) {
         if (!isEmptyDatabase(patient_or_doctor)) {
-            for (int i = 0; i <= patient_counter; i++) {
+            for (int i = 0; i < patient_counter; i++) {
                 cout << " _";
                 cout << "\nPatient ID : " << i;
                 cout << "\nPatient Name : " << patient[i].name;
@@ -274,13 +260,22 @@ void displayRecords(string *patient_or_doctor) {
     }
     else {
         if (!isEmptyDatabase(patient_or_doctor)) {
-            for (int i = 0; i <= doctor_counter; i++) {
+            for (int i = 0; i < doctor_counter; i++) {
                 cout << " __";
                 cout << "\nDoctor ID : " << i;
                 cout << "\nDoctor Name : " << doctors[i].doc_name;
-                cout << "\nDoctor Days : " << doctors[i].clinic_days;
-                cout << "\nDoctor Slots : " << doctors[i].doctors_slots;
-                cout << "\n___";
+                cout << "\nDoctor Days : ";
+                for (int j = 0; j < 5; j++) {
+                    cout << doctors[i].clinic_days[j] << " ";
+                }
+
+                cout << "\nDoctor Slots :\n";
+                for (int j = 0; j < 5; j++) {
+                    for (int k = 0; k < 6; k++) {
+                        cout << doctors[i].doctors_slots[j][k] << " ";
+                    }
+                    cout << endl;
+                }
                 cout << endl << endl << endl;
             }
         }
@@ -288,7 +283,7 @@ void displayRecords(string *patient_or_doctor) {
 
 }
 
-int searchPatientOrDoctor(string *patient_or_doctor) {
+int searchPatientOrDoctor(string* patient_or_doctor) {
     bool found = false;
     int search_id;
 
@@ -300,7 +295,7 @@ int searchPatientOrDoctor(string *patient_or_doctor) {
             cout << "\n___";
             cout << "\nEnter Patient ID you want to search: ";
             cin >> search_id;
-            cout << "___\n";
+            cout << "_\n";
             if (search_id < 0 || search_id >= 'A' && search_id <= 'Z' || search_id >= 'a' && search_id <= 'z') {
                 cout << "\nIncorrect ID entered!\n";
                 cout << "_\n";
@@ -330,7 +325,7 @@ int searchPatientOrDoctor(string *patient_or_doctor) {
             cout << "\n___";
             cout << "\nEnter Doctor ID you want to search: ";
             cin >> search_id;
-            cout << "___\n";
+            cout << "_\n";
             if (search_id < 0 || search_id >= 'A' && search_id <= 'Z' || search_id >= 'a' && search_id <= 'z') {
                 cout << "\nIncorrect ID entered!\n";
                 cout << "_\n";
@@ -419,7 +414,7 @@ void displaySlots(int doc_selected, int day_selected) {
     cout << endl << endl;
 }
 
-void displayPatientOrDoctor(int id, string *patient_or_doctor) {
+void displayPatientOrDoctor(int id, string* patient_or_doctor) {
     system("CLS");
     displayOnTop();
     if (isPatient(patient_or_doctor)) {
@@ -437,13 +432,23 @@ void displayPatientOrDoctor(int id, string *patient_or_doctor) {
         cout << " __";
         cout << "\nDoctor ID : " << id;
         cout << "\nDoctor Name : " << doctors[id].doc_name;
-        cout << "\nDoctor Days : " << doctors[id].clinic_days;
-        cout << "\nDoctor Slots : " << doctors[id].doctors_slots;
-        cout << "\n___";
+        cout << "\nDoctor Days : ";
+        for (int i = 0; i < 5; i++) {
+            cout << doctors[id].clinic_days[i] << " ";
+        }
+
+        cout << "\nDoctor Slots :\n";
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 6; j++) {
+                cout << doctors[i].doctors_slots[i][j] << " ";
+            }
+            cout << endl;
+        }
+        cout << endl << endl << endl;
     }
 }
 
-bool isEmptyDatabase(string *patient_or_doctor) {
+bool isEmptyDatabase(string* patient_or_doctor) {
     displayOnTop();
     if (isPatient(patient_or_doctor)) {
         if (patient[0].name == "Empty") {
@@ -466,45 +471,6 @@ bool isEmptyDatabase(string *patient_or_doctor) {
 
 }
 
-int getLastPatientID() {
-    string sLine;
-    int count = 0;
-
-    ifstream infile("PatientData.txt");
-
-    if (infile.good())
-    {
-        getline(infile, sLine);
-        cout << "\nBefore converting patient data from the file: " << sLine << endl;
-        count = stoi(sLine);
-        cout << "\nAfter converting patient data from the file: " << count << endl;
-    }
-    else {
-        cout << "\n\nSomething went wrong while opening file PatientData.txt.\n\n";
-    }
-    return count;
-}
-
-int getLastDoctorID() {
-    string sLine;
-    int count = 0;
-
-    ifstream infile("DoctorData.txt");
-
-    if (infile.good())
-    {
-        getline(infile, sLine);
-        cout << "\nBefore converting doctor data from the file: " << sLine << endl;
-        count = stoi(sLine);
-        cout << "\nAfter converting doctor data from the file: " << count << endl;
-    }
-    else {
-        cout << "\n\nSomething went wrong while opening file DoctorData.txt.\n\n";
-    }
-    return count;
-
-}
-
 int loginScreen() {
 
     int selection;
@@ -520,12 +486,10 @@ int loginScreen() {
 
     system("CLS");
 
-    if (selection >=1 && selection <= 3) {}
-    else {
+    if (selection < 1 || selection > 3) {
         cout << "Task not available!\n\n\n";
         goto WrongSelection;
     }
-
     return selection;
 }
 
@@ -571,35 +535,31 @@ void displayAdminMainMenu() {
 
         string patient_or_doctor = "Doctor";
 
-        if (selection < 1 || selection > 6) {
-            cout << "Task not available!\n\n\n";
-            goto WrongSelection;
-        }
-
-        if(selection == 1) {
+        if (selection == 1) {
             addDoctor();
         }
-        else if(selection == 2) {
+        else if (selection == 2) {
             patient_or_doctor = "Doctor";
             deleteDoctorOrPatient(&patient_or_doctor);
         }
-        else if(selection == 3) {
+        else if (selection == 3) {
             modifyDoctorData();
         }
-        else if(selection == 4) {
+        else if (selection == 4) {
             patient_or_doctor = "Doctor";
             searchPatientOrDoctor(&patient_or_doctor);
         }
-        else if(selection == 5) {
+        else if (selection == 5) {
             patient_or_doctor = "Doctor";
             displayRecords(&patient_or_doctor);
         }
-        else if(selection == 6) {
+        else if (selection == 6) {
             patient_or_doctor = "Patient";
             deleteDoctorOrPatient(&patient_or_doctor);
         }
         else {
-            cout << "\nSomething went wrong...";
+            cout << "Task not available!\n\n\n";
+            goto WrongSelection;
         }
         cout << "\n\nDo you wish to perform another task?(Y/N): ";
         cin >> response;
@@ -607,7 +567,7 @@ void displayAdminMainMenu() {
     } while (response == 'y' || response == 'Y');
 }
 
-bool isPatient(string *patient_or_doctor) {
+bool isPatient(string* patient_or_doctor) {
     if (*patient_or_doctor == "Patient" || *patient_or_doctor == "patient") {
         return true;
     }
@@ -669,7 +629,7 @@ void addDoctorSlots(int id) {
 
     for (int i = 0; i < 6; i++) {
         cout << "Enter here: ";
-        getline(cin,timings[i]);
+        getline(cin, timings[i]);
         if (timings[i] == "skip" || timings[i] == "Skip") {
             timings[i] = "Booked";
         }
@@ -681,7 +641,7 @@ void addDoctorSlots(int id) {
     }
 }
 
-void deleteDoctorOrPatient(string *patient_or_doctor) {
+void deleteDoctorOrPatient(string* patient_or_doctor) {
     int id = 0;
     char response;
     if (isPatient(patient_or_doctor)) {
@@ -792,7 +752,7 @@ void saveDataToFile() {
 
     if (SavePatientFile.is_open()) {
         SavePatientFile << patient_counter << endl;
-        for (int i = 0; i <= patient_counter; i++) {
+        for (int i = 0; i < patient_counter; i++) {
             SavePatientFile << patient[i].name << endl;
             SavePatientFile << patient[i].age << endl;
             SavePatientFile << patient[i].gender << endl;
@@ -809,7 +769,7 @@ void saveDataToFile() {
     SaveDoctorFile.open("DoctorData.txt", ios::out);
     if (SaveDoctorFile.is_open()) {
         SaveDoctorFile << doctor_counter << endl;
-        for (int i = 0; i <= doctor_counter; i++) {
+        for (int i = 0; i < doctor_counter; i++) {
             SaveDoctorFile << doctors[i].doc_name << endl;
             for (int j = 0; j < 5; j++) {
                 SaveDoctorFile << doctors[i].clinic_days[j] << " ";
@@ -830,14 +790,13 @@ void saveDataToFile() {
 }
 
 void getDataFromFile() {
-    string junk;
 
     fstream GetPatientFile;
     GetPatientFile.open("PatientData.txt", ios::in);
 
     if (GetPatientFile.is_open()) {
-        GetPatientFile >> junk;
-        for (int i = 0; i <= patient_counter; i++) {
+        GetPatientFile >> patient_counter;
+        for (int i = 0; i < patient_counter; i++) {
             GetPatientFile >> patient[i].name;
             GetPatientFile >> patient[i].age;
             GetPatientFile >> patient[i].gender;
@@ -855,19 +814,19 @@ void getDataFromFile() {
     GetDoctorFile.open("DoctorData.txt", ios::in);
     if (GetDoctorFile.is_open()) {
 
-        GetDoctorFile >> junk;
+        GetDoctorFile >> doctor_counter;
         for (int i = 0; i <= doctor_counter; i++) {
             GetDoctorFile >> doctors[i].doc_name;
             for (int j = 0; j < 5; j++) {
                 GetDoctorFile >> doctors[i].clinic_days[j];
             }
-            GetDoctorFile << endl;
             for (int j = 0; j < 5; j++) {
                 for (int k = 0; k < 6; k++) {
                     GetDoctorFile >> doctors[j].doctors_slots[j][k];
                 }
             }
         }
+
     }
     else {
         cout << "\n\nCouldn't open DoctorData.txt!\n";
@@ -918,5 +877,21 @@ void testRecommendation() {
                 cout << "\n\nInvalid selection...\n\n";
                 break;
         }
-    }while(selection < 1 || selection > 5);
+    } while (selection < 1 || selection > 5);
+}
+
+void firstRun() {
+
+    fstream doctor_data("DoctorData.txt");
+    if (!doctor_data) {
+        doctor_data.open("DoctorData.txt", ios::out);
+        doctor_data << 0;
+    }
+
+    fstream patient_data("PatientData.txt");
+    if (!patient_data) {
+        patient_data.open("PatientData.txt", ios::out);
+        patient_data << 0;
+    }
+
 }
